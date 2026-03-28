@@ -8,20 +8,22 @@ def main():
     mq_user = os.getenv('MQ_USER', 'guest')
     mq_pass = os.getenv('MQ_PASS', 'guest')
 
-    time.sleep(2)
+    # Retry logic to wait for RabbitMQ to be ready
+    connection = None
+    print(f"[*] Attempting to connect to RabbitMQ at {rabbitmq_host}...", flush=True)
 
-    # Set up the credentials
-    credentials = pika.PlainCredentials(mq_user, mq_pass)
-    parameters = pika.ConnectionParameters(host=rabbitmq_host, credentials=credentials)
+    while not connection:
+        try:
+            credentials = pika.PlainCredentials(mq_user, mq_pass)
+            parameters = pika.ConnectionParameters(host=rabbitmq_host, credentials=credentials)
+            connection = pika.BlockingConnection(parameters)
+        except pika.exceptions.AMQPConnectionError:
+            print("[!] RabbitMQ not ready yet, retrying in 2 seconds...", flush=True)
+            time.sleep(2)
 
-    connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
-
     queue_name = 'ABC'
     channel.queue_declare(queue=queue_name)
-
-    print(f"[*] Publisher connected to {rabbitmq_host} as user '{mq_user}'. Sending messages to '{queue_name}'...",
-          flush=True)
 
     for i in range(1, 11):
         message = f"Hello! This is message number {i}"
