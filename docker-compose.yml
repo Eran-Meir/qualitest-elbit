@@ -32,6 +32,7 @@ services:
     command: python publisher.py
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - PYTHONUNBUFFERED=1i
     depends_on:
       rabbitmq:
         condition: service_healthy
