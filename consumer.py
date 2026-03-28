@@ -17,7 +17,7 @@ def main():
     channel.queue_declare(queue=queue_name)
 
     def callback(ch, method, properties, body):
-        print(f" [x] Received {body.decode()}")
+        print(f" [x] Received {body.decode()}", flush=True)
 
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 
