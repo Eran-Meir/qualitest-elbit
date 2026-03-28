@@ -4,28 +4,33 @@ import os
 
 
 def main():
-    # Fetch the host from environment variables, default to localhost
     rabbitmq_host = os.getenv('RABBITMQ_HOST', 'localhost')
+    mq_user = os.getenv('MQ_USER', 'guest')
+    mq_pass = os.getenv('MQ_PASS', 'guest')
 
-    # Add a small delay to ensure RabbitMQ is fully ready to accept connections
-    time.sleep(5)
+    time.sleep(2)
 
-    connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitmq_host))
+    # Set up the credentials
+    credentials = pika.PlainCredentials(mq_user, mq_pass)
+    parameters = pika.ConnectionParameters(host=rabbitmq_host, credentials=credentials)
+
+    connection = pika.BlockingConnection(parameters)
     channel = connection.channel()
 
     queue_name = 'ABC'
     channel.queue_declare(queue=queue_name)
 
-    print(f"[*] Publisher connected to {rabbitmq_host}. Sending messages to '{queue_name}'...")
+    print(f"[*] Publisher connected to {rabbitmq_host} as user '{mq_user}'. Sending messages to '{queue_name}'...",
+          flush=True)
 
     for i in range(1, 11):
         message = f"Hello! This is message number {i}"
         channel.basic_publish(exchange='', routing_key=queue_name, body=message)
-        print(f" [x] Sent '{message}'")
+        print(f" [x] Sent '{message}'", flush=True)
         time.sleep(0.5)
 
     connection.close()
-    print("[*] All messages sent. Connection closed.")
+    print("[*] All messages sent. Connection closed.", flush=True)
 
 
 if __name__ == '__main__':

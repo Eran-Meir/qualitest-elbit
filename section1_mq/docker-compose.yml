@@ -22,6 +22,9 @@ services:
     command: python consumer.py
     environment:
       - RABBITMQ_HOST=rabbitmq
+      - PYTHONUNBUFFERED=1
+      - MQ_USER=eran
+      - MQ_PASS=likes-elbit-and-qualitest
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -32,7 +35,9 @@ services:
     command: python publisher.py
     environment:
       - RABBITMQ_HOST=rabbitmq
-      - PYTHONUNBUFFERED=1i
+      - PYTHONUNBUFFERED=1
+      - MQ_USER=eran
+      - MQ_PASS=likes-elbit-and-qualitest
     depends_on:
       rabbitmq:
         condition: service_healthy
