@@ -1,0 +1,31 @@
+=========================================================
+CPU MONITORING SERVICE - HIGH LEVEL PSEUDO-CODE
+=========================================================
+
+IMPORT psutil, time, logging
+
+// 1. Define configuration thresholds
+DEFINE THRESHOLD = 80.0
+DEFINE CHECK_INTERVAL = 5 seconds
+
+// 2. Define the main monitoring loop
+FUNCTION start_monitoring():
+    LOG "Starting CPU Monitor. Threshold set to 80%."
+
+    WHILE True:
+        // 3. Capture CPU average over a 1-second window
+        // (Blocking for 1 second ensures an accurate average rather than a momentary spike)
+        current_cpu = psutil.cpu_percent(interval=1)
+
+        // 4. Evaluate against threshold
+        IF current_cpu > THRESHOLD:
+            TRIGGER_ALERT("CRITICAL: CPU usage is at {current_cpu}%")
+            LOG_TO_FILE("Alert dispatched for high CPU.")
+        ELSE:
+            LOG "CPU usage normal: {current_cpu}%"
+
+        // 5. Sleep to prevent the monitor from consuming CPU
+        WAIT(CHECK_INTERVAL)
+
+// 6. Execute the service
+start_monitoring()
