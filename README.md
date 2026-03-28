@@ -69,6 +69,27 @@ When the CPU threshold (80%) is breached, the system triggers an alerting mechan
 ### 5. Live Simulation & Stress Test
 To verify the monitoring and alerting logic, a live stress test was conducted across multiple terminals to simulate a critical CPU spike.
 
+This is the full `cpu_alerts.log` output while inducing a stress test:
+```text
+2026-03-28 22:49:13,792 - [INFO] - Starting CPU Monitor. Alert threshold set to 80.0%
+2026-03-28 22:49:13,792 - [INFO] - Press CTRL+C to stop.
+2026-03-28 22:49:14,825 - [INFO] - CPU usage normal: 1.2%
+2026-03-28 22:49:20,829 - [INFO] - CPU usage normal: 17.3%
+2026-03-28 22:49:26,830 - [INFO] - CPU usage normal: 75.3%
+2026-03-28 22:49:32,832 - [WARNING] - CRITICAL ALERT: CPU usage exceeded threshold! Current usage: 99.5%
+2026-03-28 22:49:38,833 - [WARNING] - CRITICAL ALERT: CPU usage exceeded threshold! Current usage: 98.0%
+2026-03-28 22:49:44,836 - [WARNING] - CRITICAL ALERT: CPU usage exceeded threshold! Current usage: 86.5%
+2026-03-28 22:49:50,839 - [WARNING] - CRITICAL ALERT: CPU usage exceeded threshold! Current usage: 98.7%
+2026-03-28 22:49:56,841 - [WARNING] - CRITICAL ALERT: CPU usage exceeded threshold! Current usage: 84.2%
+2026-03-28 22:50:50,866 - [WARNING] - CRITICAL ALERT: CPU usage exceeded threshold! Current usage: 93.7%
+2026-03-28 22:50:56,892 - [INFO] - CPU usage normal: 7.3%
+2026-03-28 22:51:02,922 - [INFO] - CPU usage normal: 1.5%
+2026-03-28 22:51:08,928 - [INFO] - CPU usage normal: 0.3%
+2026-03-28 22:51:10,511 - [INFO] - Monitoring stopped by user.
+```
+
+Monitoring log breakdown:
+
 **Step 1: Start the Monitor (Terminal 1)**
 The monitor was started within a virtual environment. Initial CPU usage was stable and below the 80% threshold.
 ```text
