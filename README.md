@@ -2,15 +2,14 @@
 
 ## Section 1: Message Queue Implementation (RabbitMQ)
 
-This section implements a simple Publisher/Consumer architecture using Python and RabbitMQ. 
+This section implements a simple Publisher/Consumer architecture using Python and RabbitMQ. The entire stack is containerized for a seamless, zero-configuration startup.
 
 ### Prerequisites
-* Docker and Docker Compose installed.
-* Python 3.8+ installed.
+* Docker and Docker Compose installed on your machine.
 
-### Setup Instructions
+### Running the System
 
-1. **Start the RabbitMQ Broker:**
-   Navigate to the repository root and start the RabbitMQ container in detached mode:
+1. **Launch the Environment:**
+   Navigate to the root of the repository and run:
    ```bash
-   docker-compose up -d
+   docker-compose up --build

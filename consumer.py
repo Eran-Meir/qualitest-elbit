@@ -1,31 +1,28 @@
 import pika
 import sys
 import os
+import time
 
 
 def main():
-    # 1. Establish connection to RabbitMQ
-    connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
+    rabbitmq_host = os.getenv('RABBITMQ_HOST', 'localhost')
+
+    # Add a small delay to ensure RabbitMQ is fully ready
+    time.sleep(5)
+
+    connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitmq_host))
     channel = connection.channel()
 
-    # 2. Declare the queue "ABC" (Idempotent: ensures it exists before we try to consume)
     queue_name = 'ABC'
     channel.queue_declare(queue=queue_name)
 
-    # 3. Define the callback function for when a message is received
     def callback(ch, method, properties, body):
         print(f" [x] Received {body.decode()}")
 
-    # 4. Subscribe to the channel
-    channel.basic_consume(
-        queue=queue_name,
-        on_message_callback=callback,
-        auto_ack=True  # Automatically acknowledge messages once received
-    )
+    channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=True)
 
-    print(f"[*] Waiting for messages on channel '{queue_name}'. To exit press CTRL+C")
+    print(f"[*] Waiting for messages on '{queue_name}' at {rabbitmq_host}. To exit press CTRL+C")
 
-    # 5. Start consuming
     try:
         channel.start_consuming()
     except KeyboardInterrupt:
