@@ -4,8 +4,11 @@ import os
 import threading
 import time
 import datetime
+import logging
 
 app = Flask(__name__)
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'localhost')
 MQ_USER = os.getenv('MQ_USER', 'eran')

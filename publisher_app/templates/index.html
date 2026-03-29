@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,42 +7,41 @@
     <link href="[https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css](https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css)" rel="stylesheet">
 </head>
 <body class="bg-light">
-    <div class="container mt-5">
-        <h2 class="mb-4 text-primary">RabbitMQ Publisher Dashboard</h2>
+    <div class="container mt-5 text-center" style="max-width: 800px;">
+        <h2 class="mb-4 text-primary fw-bold">RabbitMQ Publisher Dashboard</h2>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+              <div class="alert alert-{{ category }} shadow-sm fw-bold" role="alert">
                 {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
               </div>
             {% endfor %}
           {% endif %}
         {% endwith %}
 
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Automated Task</h5>
-                        <p class="card-text text-muted">Click below to satisfy the assignment requirement: Send 10 sequential messages to the 'ABC' channel.</p>
+        <div class="row mt-4">
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <h5 class="card-title fw-bold">Automated Task</h5>
+                        <p class="card-text text-muted mb-4">Send 10 default messages.</p>
                         <form action="/publish_default" method="POST">
-                            <button type="submit" class="btn btn-primary w-100">Send 10 Default Messages</button>
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">Send Messages</button>
                         </form>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title">Custom Message</h5>
-                        <p class="card-text text-muted">Type a custom payload to publish directly to the 'ABC' queue.</p>
+            <div class="col-md-6 mb-4">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-body d-flex flex-column justify-content-center">
+                        <h5 class="card-title fw-bold">Custom Message</h5>
+                        <p class="card-text text-muted mb-4">Publish a custom payload.</p>
                         <form action="/publish_custom" method="POST">
-                            <div class="input-group">
+                            <div class="input-group shadow-sm">
                                 <input type="text" class="form-control" name="custom_message" placeholder="Enter message..." required>
-                                <button type="submit" class="btn btn-success">Publish</button>
+                                <button type="submit" class="btn btn-success fw-bold">Publish</button>
                             </div>
                         </form>
                     </div>
@@ -51,7 +49,5 @@
             </div>
         </div>
     </div>
-
-    <script src="[https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js](https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js)"></script>
 </body>
 </html>

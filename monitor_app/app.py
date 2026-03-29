@@ -1,7 +1,11 @@
 from flask import Flask, render_template, jsonify
 import psutil
+import logging
 
 app = Flask(__name__)
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 # Initialize psutil CPU polling
 psutil.cpu_percent(interval=None)

@@ -12,24 +12,24 @@
     </style>
 </head>
 <body class="bg-light" id="main-body">
-    <div class="container mt-5">
+    <div class="container mt-5 text-center" style="max-width: 900px;">
 
-        <div id="alert-banner" class="alert alert-danger text-center shadow-lg mb-5 border-danger border-3">
+        <div id="alert-banner" class="alert alert-danger shadow-lg mb-5 border-danger border-3">
             <h1 class="display-4 fw-bold text-danger">⚠️ CRITICAL CPU ALERT ⚠️</h1>
-            <p class="lead fw-bold">System CPU usage has exceeded the 80% threshold!</p>
+            <p class="lead fw-bold mb-0">System CPU usage has exceeded the 80% threshold!</p>
         </div>
 
-        <h2 class="mb-4 text-primary" id="dashboard-title">Live System Metrics Dashboard</h2>
+        <h2 class="mb-4 text-primary fw-bold" id="dashboard-title">Live System Metrics Dashboard</h2>
 
-        <div class="row">
+        <div class="row mt-4">
             <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-dark text-white">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-header bg-dark text-white fw-bold">
                         CPU Usage (Operating System)
                     </div>
-                    <div class="card-body d-flex flex-column justify-content-center">
-                        <h1 class="text-center display-2 mb-3" id="cpu-text">0%</h1>
-                        <div class="progress" style="height: 30px;">
+                    <div class="card-body d-flex flex-column justify-content-center p-4">
+                        <h1 class="display-2 mb-4 fw-bold" id="cpu-text">0%</h1>
+                        <div class="progress shadow-sm" style="height: 35px; border-radius: 20px;">
                             <div id="cpu-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%;"></div>
                         </div>
                     </div>
@@ -37,13 +37,13 @@
             </div>
 
             <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100">
-                    <div class="card-header bg-dark text-white">
+                <div class="card shadow-sm h-100 border-0">
+                    <div class="card-header bg-dark text-white fw-bold">
                         RAM / Memory Usage
                     </div>
-                    <div class="card-body d-flex flex-column justify-content-center">
-                        <h1 class="text-center display-2 mb-3" id="mem-text">0%</h1>
-                        <div class="progress" style="height: 30px;">
+                    <div class="card-body d-flex flex-column justify-content-center p-4">
+                        <h1 class="display-2 mb-4 fw-bold" id="mem-text">0%</h1>
+                        <div class="progress shadow-sm" style="height: 35px; border-radius: 20px;">
                             <div id="mem-bar" class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 0%;"></div>
                         </div>
                     </div>
@@ -54,7 +54,6 @@
 
     <script>
         const CPU_THRESHOLD = 80.0;
-
         function updateDashboard() {
             fetch('/api/metrics')
                 .then(response => response.json())
@@ -62,35 +61,28 @@
                     const cpu = data.cpu_percent;
                     const mem = data.memory_percent;
 
-                    // Update Text
                     document.getElementById('cpu-text').innerText = cpu + '%';
                     document.getElementById('mem-text').innerText = mem + '%';
 
-                    // Update Progress Bars
                     const cpuBar = document.getElementById('cpu-bar');
                     cpuBar.style.width = cpu + '%';
-
                     const memBar = document.getElementById('mem-bar');
                     memBar.style.width = mem + '%';
 
-                    // 🚨 CRITICAL ALERT LOGIC 🚨
                     const body = document.getElementById('main-body');
                     const alertBanner = document.getElementById('alert-banner');
                     const title = document.getElementById('dashboard-title');
 
                     if (cpu >= CPU_THRESHOLD) {
-                        // Trigger Red Alert
                         body.classList.add('critical-mode');
                         alertBanner.style.display = 'block';
                         title.classList.replace('text-primary', 'text-danger');
                         cpuBar.classList.replace('bg-success', 'bg-danger');
                         cpuBar.classList.replace('bg-warning', 'bg-danger');
                     } else {
-                        // Return to Normal
                         body.classList.remove('critical-mode');
                         alertBanner.style.display = 'none';
                         title.classList.replace('text-danger', 'text-primary');
-
                         if (cpu >= 60) {
                             cpuBar.classList.replace('bg-success', 'bg-warning');
                             cpuBar.classList.replace('bg-danger', 'bg-warning');
@@ -102,10 +94,7 @@
                 })
                 .catch(err => console.error("Failed to fetch metrics", err));
         }
-
-        // Poll every 2 seconds
         setInterval(updateDashboard, 2000);
-        // Run once immediately on load
         updateDashboard();
     </script>
 </body>

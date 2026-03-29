@@ -2,9 +2,13 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import pika
 import os
 import time
+import logging
 
 app = Flask(__name__)
 app.secret_key = "qualitest_elbit_secret"  # Needed for UI flash messages
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 RABBITMQ_HOST = os.getenv('RABBITMQ_HOST', 'localhost')
 # Updated defaults to your specific credentials

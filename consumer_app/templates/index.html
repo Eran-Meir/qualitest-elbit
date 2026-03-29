@@ -15,20 +15,21 @@
             padding: 15px;
             border-radius: 5px;
             border: 1px solid #333;
+            text-align: left; /* Keep the actual logs aligned left */
         }
     </style>
 </head>
 <body class="bg-light">
-    <div class="container mt-5">
-        <h2 class="mb-4 text-success">RabbitMQ Consumer Dashboard</h2>
+    <div class="container mt-5 text-center" style="max-width: 800px;">
+        <h2 class="mb-4 text-success fw-bold">RabbitMQ Consumer Dashboard</h2>
 
-        <div class="card shadow-sm">
+        <div class="card shadow-sm border-0">
             <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-                <span>Live Message Feed (Channel: ABC)</span>
+                <span class="fw-bold">Live Message Feed (Channel: ABC)</span>
                 <span class="badge bg-success" id="status-badge">Listening...</span>
             </div>
             <div class="card-body bg-dark">
-                <div class="terminal-window" id="message-container">
+                <div class="terminal-window shadow-inner" id="message-container">
                     <div>Waiting for messages...</div>
                 </div>
             </div>
@@ -36,26 +37,19 @@
     </div>
 
     <script>
-        // Poll the server every 1000ms (1 second) for new messages
         setInterval(function() {
             fetch('/api/messages')
                 .then(response => response.json())
                 .then(data => {
                     const container = document.getElementById('message-container');
+                    if (data.length === 0) return;
 
-                    if (data.length === 0) {
-                        return; // Do nothing if empty
-                    }
-
-                    // Clear the container and rebuild it
                     container.innerHTML = '';
                     data.forEach(msg => {
                         const div = document.createElement('div');
                         div.textContent = msg;
                         container.appendChild(div);
                     });
-
-                    // Auto-scroll to the bottom
                     container.scrollTop = container.scrollHeight;
                 })
                 .catch(error => console.error('Error fetching messages:', error));
