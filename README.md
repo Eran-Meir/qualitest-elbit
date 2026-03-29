@@ -135,6 +135,24 @@ eran@Ubuntu:~$ killall yes
 2026-03-28 22:51:10,511 - [INFO] - Monitoring stopped by user.
 ```
 
+
+### 6. Production Scalability & Advanced Observability
+
+While the current implementation provides immediate visibility via local logging, a production environment requires a shift from "reactive scripts" to "proactive observability."
+
+#### **Enterprise Monitoring with Grafana & Prometheus**
+In a production-grade infrastructure (e.g., GKE or On-Premise), I would replace local alerting with a centralized observability stack:
+* **Metrics Collection:** Use a **Prometheus Node Exporter** or **Grafana Agent** to collect host/container metrics.
+* **Visualization:** I would implement two distinct Grafana dashboards:
+    1. **Resource Overview:** A dashboard showing real-time and historical CPU/Memory trends to identify patterns (e.g., "Monday morning spikes").
+    2. **Alerting Status:** A dedicated dashboard visualizing active firing alerts from **Alertmanager**, integrated with Slack/PagerDuty instead of email to reduce "alert fatigue."
+
+#### **Cloud Orchestration & Automated Remediation (GCP/Kubernetes)**
+If this service encountered >80% CPU usage in a production environment, we would utilize Kubernetes native features to maintain availability:
+
+* **Horizontal Pod Autoscaler (HPA):** We would configure an HPA resource to monitor the CPU metrics. When usage breaches the 80% threshold, Kubernetes would automatically spin up additional replicas (Pods) to distribute the traffic/load across the cluster.
+* **Workload Isolation:** To prevent a single heavy task from impacting the entire OS, I would split the application into different Pods with defined **resource limits and requests**. This ensures that "noisy neighbors" are contained.
+* **RabbitMQ in K8s:** For production, RabbitMQ should be deployed as a **StatefulSet** using the **RabbitMQ Cluster Operator**. This ensures data persistence and allows the queue itself to scale horizontally to handle higher message throughput without saturating a single node's CPU.
 ---
 
 ## Bonus Question: Understanding and Moving Multicast Messages
