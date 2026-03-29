@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RabbitMQ Consumer</title>
+    <link href="[https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css](https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css)" rel="stylesheet">
+    <style>
+        .terminal-window {
+            background-color: #1e1e1e;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="mb-4 text-success">RabbitMQ Consumer Dashboard</h2>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <span>Live Message Feed (Channel: ABC)</span>
+                <span class="badge bg-success" id="status-badge">Listening...</span>
+            </div>
+            <div class="card-body bg-dark">
+                <div class="terminal-window" id="message-container">
+                    <div>Waiting for messages...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Poll the server every 1000ms (1 second) for new messages
+        setInterval(function() {
+            fetch('/api/messages')
+                .then(response => response.json())
+                .then(data => {
+                    const container = document.getElementById('message-container');
+
+                    if (data.length === 0) {
+                        return; // Do nothing if empty
+                    }
+
+                    // Clear the container and rebuild it
+                    container.innerHTML = '';
+                    data.forEach(msg => {
+                        const div = document.createElement('div');
+                        div.textContent = msg;
+                        container.appendChild(div);
+                    });
+
+                    // Auto-scroll to the bottom
+                    container.scrollTop = container.scrollHeight;
+                })
+                .catch(error => console.error('Error fetching messages:', error));
+        }, 1000);
+    </script>
+</body>
+</html>

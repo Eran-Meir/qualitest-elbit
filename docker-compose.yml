@@ -16,30 +16,39 @@ services:
       timeout: 5s
       retries: 5
 
-  consumer:
-    build: .
-    container_name: mq_consumer
-    command: python consumer.py
+  publisher:
+    build: ./publisher_app
+    container_name: web_publisher
+    ports:
+      - "5001:5001"
     environment:
       - RABBITMQ_HOST=rabbitmq
-      - PYTHONUNBUFFERED=1
       - MQ_USER=eran
       - MQ_PASS=likes-elbit-and-qualitest
+      - PYTHONUNBUFFERED=1
     depends_on:
       rabbitmq:
         condition: service_healthy
 
-  publisher:
-    build: .
-    container_name: mq_publisher
-    command: python publisher.py
+  consumer:
+    build: ./consumer_app
+    container_name: web_consumer
+    ports:
+      - "5002:5002"
     environment:
       - RABBITMQ_HOST=rabbitmq
-      - PYTHONUNBUFFERED=1
       - MQ_USER=eran
       - MQ_PASS=likes-elbit-and-qualitest
+      - PYTHONUNBUFFERED=1
     depends_on:
       rabbitmq:
         condition: service_healthy
-      consumer:
-        condition: service_started
+
+  monitor:
+    build: ./monitor_app
+    container_name: web_monitor
+    pid: "host"                  # CRITICAL: Allows reading host OS CPU/RAM
+    ports:
+      - "5003:5003"
+    environment:
+      - PYTHONUNBUFFERED=1
