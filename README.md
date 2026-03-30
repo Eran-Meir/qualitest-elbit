@@ -123,7 +123,7 @@ Standard routers block multicast by default. To route messages between networks:
 
 ---
 
-## Chaos Engineering & System Resilience Testing
+## System Resilience Testing
 
 To demonstrate the fault tolerance of this microservices architecture, the following chaos engineering scenarios were executed. These tests prove that the system can handle unexpected broker outages and worker failures without data loss or catastrophic crashes.
 
