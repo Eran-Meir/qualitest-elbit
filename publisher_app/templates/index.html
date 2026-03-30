@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RabbitMQ Publisher</title>
     <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; padding: 40px 20px; }
+        /* 100% Self-Contained CSS */
+
+        /* FIX: Apply a universal reset to ensure padding is contained within elements */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; padding: 40px 20px; }
         .container { max-width: 800px; margin: 0 auto; text-align: center; }
         h2 { color: #0d6efd; font-size: 2.2em; margin-bottom: 30px; font-weight: bold; }
 
@@ -15,8 +19,8 @@
         .alert-danger { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
         .alert-warning { background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; }
 
-        .row { display: flex; gap: 25px; justify-content: center; flex-wrap: wrap; }
-        .card { background: white; flex: 1; min-width: 300px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.05); padding: 30px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
+        .row { display: flex; gap: 25px; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
+        .card { background: white; flex: 1; min-width: 300px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.05); padding: 30px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; }
         .card-title { font-size: 1.4em; color: #212529; margin: 0 0 10px 0; font-weight: bold; }
         .card-text { color: #6c757d; margin-bottom: 25px; line-height: 1.5; }
 
@@ -26,8 +30,7 @@
         .btn-primary { background-color: #0d6efd; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3); }
         .btn-success { background-color: #198754; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); }
 
-        /* FIX: Flexbox constraints applied */
-        form { width: 100%; margin: 0; padding: 0; }
+        /* FIX: Flexbox constraints applied to ensure everything fits perfectly inside the white card */
         .input-group { display: flex; gap: 10px; width: 100%; }
         /* min-width: 0 prevents the input from forcing the button out of bounds */
         .input-group input { flex: 1 1 auto; min-width: 0; padding: 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 1em; outline: none; transition: border-color 0.2s; }
@@ -53,10 +56,10 @@
             <div class="card">
                 <div>
                     <h5 class="card-title">Automated Task</h5>
-                    <p class="card-text">Send 10 default messages automatically to the message broker.</p>
+                    <p class="card-text">Manual override: Click below to re-send the 10 default messages.</p>
                 </div>
                 <form action="/publish_default" method="POST">
-                    <button type="submit" class="btn btn-primary">Send 10 Messages</button>
+                    <button type="submit" class="btn btn-primary">Re-Send 10 Messages</button>
                 </form>
             </div>
 
