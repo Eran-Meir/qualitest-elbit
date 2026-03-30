@@ -54,23 +54,28 @@ To monitor the host OS CPU usage, I implemented a custom Flask application (`mon
 The service polls the OS every 2 seconds. The `interval=0.5` parameter in `psutil` ensures a true average CPU usage is calculated, preventing false positives from momentary sub-second spikes.
 * **URL:** `http://localhost:5003`
 
-![Healthy System Metrics](images/healthy_system_metrics.png)
+![Healthy System Metrics](images/monitor_healthy.png)
 
 ### 3. Live Simulation & Stress Test
-To verify the alerting logic (threshold > 80%), a live stress test was conducted. 
+To verify the dynamic alerting logic (Yellow Warning at 60%, Red Critical Alert at >80%), a live stress test was conducted. 
 
 **Step 1: Induce Artificial Load**
-In a separate terminal, a synthetic load was applied to the host machine:
+In a separate terminal, a synthetic load was applied to the host machine to gradually increase the CPU usage:
 ```bash
 yes > /dev/null & yes > /dev/null & yes > /dev/null & yes > /dev/null & yes > /dev/null &
 ```
 
-**Step 2: Verification of Alert Trigger**
-As the cumulative load hit the system, the dashboard successfully identified the breach, dynamically shifting to a critical UI state to alert operators.
+**Step 2: The Warning State (60% Threshold)**
+As the load increased past 60%, the dashboard successfully shifted the progress bars to a yellow warning state, providing operators with an early indication of rising system stress.
 
-![Critical System Metrics](images/critical_system_metrics.png)
+![Warning System Metrics](images/monitor_warning.png)
 
-**Step 3: Graceful Teardown and Cleanup**
+**Step 3: Verification of Critical Alert (>80% Threshold)**
+As the cumulative load pushed the system past the 80% threshold, the dashboard dynamically shifted to a critical UI state, triggering the red alert banner to immediately notify operators of the breach.
+
+![Critical System Metrics](images/monitor_critical.png)
+
+**Step 4: Graceful Teardown and Cleanup**
 To stop the synthetic load and tear down the microservices infrastructure:
 ```bash
 killall yes
