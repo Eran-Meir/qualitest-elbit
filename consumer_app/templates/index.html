@@ -5,25 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RabbitMQ Consumer</title>
     <style>
-        /* 100% Self-Contained CSS */
+        * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; padding: 40px 20px; }
         .container { max-width: 800px; margin: 0 auto; text-align: center; }
         h2 { color: #198754; font-size: 2.2em; margin-bottom: 30px; font-weight: bold; }
 
-        /* Dashboard Card */
         .card { background: white; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.08); overflow: hidden; text-align: left; }
         .card-header { background: #212529; color: white; padding: 18px 25px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 1.1em; }
 
-        /* Pulsing Status Badge */
-        .badge { background: #198754; color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.8em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; animation: pulse 2s infinite; box-shadow: 0 0 10px rgba(25, 135, 84, 0.5); }
+        /* Dynamic Badges */
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: white; }
+        .badge-listening { background: #198754; animation: pulse 2s infinite; box-shadow: 0 0 10px rgba(25, 135, 84, 0.5); }
+        .badge-disconnected { background: #dc3545; box-shadow: 0 0 10px rgba(220, 53, 69, 0.5); }
+
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
 
         .card-body { background: #121212; padding: 25px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; }
-
-        /* Terminal Aesthetics */
         .terminal-window { background-color: #050505; color: #00ff00; font-family: 'Consolas', 'Courier New', monospace; height: 400px; overflow-y: auto; padding: 20px; border-radius: 8px; border: 1px solid #333; font-size: 0.95em; line-height: 1.6; text-shadow: 0 0 2px rgba(0, 255, 0, 0.4); }
 
-        /* Custom Webkit Scrollbar */
         .terminal-window::-webkit-scrollbar { width: 10px; }
         .terminal-window::-webkit-scrollbar-track { background: #121212; border-radius: 5px; }
         .terminal-window::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; border: 2px solid #121212; }
@@ -37,12 +36,11 @@
         <div class="card">
             <div class="card-header">
                 <span>Live Message Feed (Channel: ABC)</span>
-                <span class="badge">Listening</span>
+                <span class="badge badge-disconnected" id="status-badge">Connecting...</span>
             </div>
             <div class="card-body">
                 <div class="terminal-window" id="message-container">
                     <div>> Initializing consumer link...</div>
-                    <div>> Waiting for incoming payloads...</div>
                 </div>
             </div>
         </div>
@@ -53,13 +51,24 @@
             fetch('/api/messages')
                 .then(response => response.json())
                 .then(data => {
+                    // Update Badge Status
+                    const badge = document.getElementById('status-badge');
+                    if (data.status === 'connected') {
+                        badge.textContent = 'Listening';
+                        badge.className = 'badge badge-listening';
+                    } else {
+                        badge.textContent = 'Disconnected';
+                        badge.className = 'badge badge-disconnected';
+                    }
+
+                    // Update Terminal Messages
                     const container = document.getElementById('message-container');
-                    if (data.length === 0) return;
+                    if (data.messages.length === 0) return;
 
                     container.innerHTML = '';
-                    data.forEach(msg => {
+                    data.messages.forEach(msg => {
                         const div = document.createElement('div');
-                        div.textContent = '> ' + msg; // Added a prompt caret for style
+                        div.textContent = '> ' + msg;
                         container.appendChild(div);
                     });
                     container.scrollTop = container.scrollHeight;
