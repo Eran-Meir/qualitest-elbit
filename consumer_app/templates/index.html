@@ -13,7 +13,6 @@
         .card { background: white; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.08); overflow: hidden; text-align: left; }
         .card-header { background: #212529; color: white; padding: 18px 25px; font-weight: bold; display: flex; justify-content: space-between; align-items: center; font-size: 1.1em; }
 
-        /* Dynamic Badges */
         .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: white; }
         .badge-listening { background: #198754; animation: pulse 2s infinite; box-shadow: 0 0 10px rgba(25, 135, 84, 0.5); }
         .badge-disconnected { background: #dc3545; box-shadow: 0 0 10px rgba(220, 53, 69, 0.5); }
@@ -48,10 +47,10 @@
 
     <script>
         setInterval(function() {
-            fetch('/api/messages')
+            // FIX: Added cache-busting so the browser never ignores live updates!
+            fetch('/api/messages', { cache: 'no-store' })
                 .then(response => response.json())
                 .then(data => {
-                    // Update Badge Status
                     const badge = document.getElementById('status-badge');
                     if (data.status === 'connected') {
                         badge.textContent = 'Listening';
@@ -61,7 +60,6 @@
                         badge.className = 'badge badge-disconnected';
                     }
 
-                    // Update Terminal Messages
                     const container = document.getElementById('message-container');
                     if (data.messages.length === 0) return;
 

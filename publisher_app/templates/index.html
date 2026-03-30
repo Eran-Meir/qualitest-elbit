@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RabbitMQ Publisher</title>
     <style>
-        /* 100% Self-Contained CSS */
-        * { box-sizing: border-box; } /* FIX: Prevents inputs/buttons from overflowing the card */
+        * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; padding: 40px 20px; }
         .container { max-width: 800px; margin: 0 auto; text-align: center; }
         h2 { color: #0d6efd; font-size: 2.2em; margin-bottom: 30px; font-weight: bold; }
@@ -17,7 +16,7 @@
         .alert-warning { background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; }
 
         .row { display: flex; gap: 25px; justify-content: center; flex-wrap: wrap; }
-        .card { background: white; flex: 1; min-width: 300px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.05); padding: 30px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; }
+        .card { background: white; flex: 1; min-width: 300px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.05); padding: 30px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; }
         .card-title { font-size: 1.4em; color: #212529; margin: 0 0 10px 0; font-weight: bold; }
         .card-text { color: #6c757d; margin-bottom: 25px; line-height: 1.5; }
 
@@ -27,11 +26,13 @@
         .btn-primary { background-color: #0d6efd; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3); }
         .btn-success { background-color: #198754; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); }
 
-        /* FIX: Adjusted padding and layout for the input group */
-        .input-group { display: flex; gap: 12px; width: 100%; margin-bottom: 5px; }
-        .input-group input { flex: 1; padding: 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 1em; outline: none; transition: border-color 0.2s; }
+        /* FIX: Flexbox constraints applied */
+        form { width: 100%; margin: 0; padding: 0; }
+        .input-group { display: flex; gap: 10px; width: 100%; }
+        /* min-width: 0 prevents the input from forcing the button out of bounds */
+        .input-group input { flex: 1 1 auto; min-width: 0; padding: 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 1em; outline: none; transition: border-color 0.2s; }
         .input-group input:focus { border-color: #198754; box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1); }
-        .input-group .btn { width: auto; padding: 14px 25px; flex-shrink: 0; }
+        .input-group .btn { flex: 0 0 auto; width: auto; padding: 14px 25px; }
     </style>
 </head>
 <body>
