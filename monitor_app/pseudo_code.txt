@@ -1,31 +1,63 @@
-=========================================================
-CPU MONITORING SERVICE - HIGH LEVEL PSEUDO-CODE
-=========================================================
+========================================================================
+PSEUDO-CODE: Microservice System Monitoring & Alerting Dashboard
+========================================================================
 
-IMPORT psutil, time, logging
+// ==========================================
+// PART 1: BACKEND API SERVICE (Data Collector)
+// ==========================================
+INITIALIZE hardware monitoring library (psutil)
+START Web Server on Port 5003
 
-// 1. Define configuration thresholds
-DEFINE THRESHOLD = 80.0
-DEFINE CHECK_INTERVAL = 5 seconds
+DEFINE Route GET '/api/metrics':
+    // Block for 0.5s to get a true average, preventing false sub-second spikes
+    CALCULATE average CPU usage over 0.5-second interval
+    CALCULATE total System Memory (RAM) percentage
 
-// 2. Define the main monitoring loop
-FUNCTION start_monitoring():
-    LOG "Starting CPU Monitor. Threshold set to 80%."
+    RETURN JSON payload:
+    {
+        "cpu_percent": CPU_VALUE,
+        "memory_percent": MEMORY_VALUE
+    }
 
-    WHILE True:
-        // 3. Capture CPU average over a 1-second window
-        // (Blocking for 1 second ensures an accurate average rather than a momentary spike)
-        current_cpu = psutil.cpu_percent(interval=1)
+// ==========================================
+// PART 2: FRONTEND DASHBOARD (Alerting Logic)
+// ==========================================
+SET ALERT_THRESHOLD = 80.0
+SET POLLING_INTERVAL = 2000 milliseconds (2 seconds)
 
-        // 4. Evaluate against threshold
-        IF current_cpu > THRESHOLD:
-            TRIGGER_ALERT("CRITICAL: CPU usage is at {current_cpu}%")
-            LOG_TO_FILE("Alert dispatched for high CPU.")
+FUNCTION evaluate_system_health():
+    // 1. Fetch live data
+    PERFORM HTTP GET request to '/api/metrics'
+    PARSE response into 'cpu' and 'memory' variables
+
+    // 2. Update Standard UI
+    UPDATE dashboard text with 'cpu' and 'memory' values
+    ADJUST progress bar widths to match 'cpu' and 'memory' percentages
+
+    // 3. Threshold Alerting Logic
+    IF 'cpu' >= ALERT_THRESHOLD THEN:
+        // TRIGGER CRITICAL ALERT
+        ACTIVATE "Critical CSS Mode" (Red Background)
+        DISPLAY massive Red Alert Banner ("⚠️ CRITICAL CPU ALERT")
+        CHANGE CPU progress bar color to RED
+    ELSE:
+        // RETURN TO NORMAL STATE
+        DEACTIVATE "Critical CSS Mode"
+        HIDE Red Alert Banner
+
+        // Minor warning state
+        IF 'cpu' >= 60.0 THEN:
+            CHANGE CPU progress bar color to YELLOW
         ELSE:
-            LOG "CPU usage normal: {current_cpu}%"
+            CHANGE CPU progress bar color to GREEN
 
-        // 5. Sleep to prevent the monitor from consuming CPU
-        WAIT(CHECK_INTERVAL)
+// ==========================================
+// PART 3: CONTINUOUS MONITORING DAEMON
+// ==========================================
+// Initialize the infinite polling loop on the client side
+ON PAGE LOAD:
+    EXECUTE evaluate_system_health()  // Run once immediately
 
-// 6. Execute the service
-start_monitoring()
+    LOOP INFINITELY:
+        WAIT POLLING_INTERVAL (2 seconds)
+        EXECUTE evaluate_system_health()

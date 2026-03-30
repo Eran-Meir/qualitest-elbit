@@ -4,48 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Monitor</title>
-    <link href="[https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css](https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css)" rel="stylesheet">
     <style>
-        body { transition: background-color 0.3s ease; }
+        /* 100% Self-Contained CSS - No external libraries needed! */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            transition: background-color 0.3s ease;
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container { max-width: 900px; margin: 0 auto; text-align: center; }
         .critical-mode { background-color: #ffcccc !important; }
-        #alert-banner { display: none; }
+
+        #alert-banner {
+            display: none;
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 3px solid #8b0000;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+        }
+        #alert-banner h1 { margin: 0 0 10px 0; font-size: 2.5em; }
+        #alert-banner p { margin: 0; font-size: 1.2em; font-weight: bold; }
+
+        .dashboard-title { color: #0d6efd; margin-bottom: 30px; font-size: 2.2em; }
+        .dashboard-title.danger-text { color: #dc3545; }
+
+        .row { display: flex; justify-content: space-between; gap: 20px; }
+        .card {
+            background: white;
+            flex: 1;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .card-header {
+            background: #212529;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .card-body { padding: 30px; }
+        .metric-text { font-size: 4em; font-weight: bold; margin: 0 0 20px 0; }
+
+        /* Custom Progress Bars */
+        .progress-track {
+            background: #e9ecef;
+            border-radius: 20px;
+            height: 35px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease, background-color 0.3s ease;
+        }
+
+        /* The Colors we were missing! */
+        .color-green { background-color: #198754; }
+        .color-yellow { background-color: #ffc107; }
+        .color-red { background-color: #dc3545; }
+        .color-blue { background-color: #0dcaf0; }
     </style>
 </head>
-<body class="bg-light" id="main-body">
-    <div class="container mt-5 text-center" style="max-width: 900px;">
+<body id="main-body">
+    <div class="container">
 
-        <div id="alert-banner" class="alert alert-danger shadow-lg mb-5 border-danger border-3">
-            <h1 class="display-4 fw-bold text-danger">⚠️ CRITICAL CPU ALERT ⚠️</h1>
-            <p class="lead fw-bold mb-0">System CPU usage has exceeded the 80% threshold!</p>
+        <div id="alert-banner">
+            <h1>⚠️ CRITICAL CPU ALERT ⚠️</h1>
+            <p>System CPU usage has exceeded the 80% threshold!</p>
         </div>
 
-        <h2 class="mb-4 text-primary fw-bold" id="dashboard-title">Live System Metrics Dashboard</h2>
+        <h2 class="dashboard-title" id="dashboard-title">Live System Metrics Dashboard</h2>
 
-        <div class="row mt-4">
-            <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-header bg-dark text-white fw-bold">
-                        CPU Usage (Operating System)
-                    </div>
-                    <div class="card-body d-flex flex-column justify-content-center p-4">
-                        <h1 class="display-2 mb-4 fw-bold" id="cpu-text">0%</h1>
-                        <div class="progress shadow-sm" style="height: 35px; border-radius: 20px;">
-                            <div id="cpu-bar" class="progress-bar progress-bar-striped progress-bar-animated bg-success" role="progressbar" style="width: 0%;"></div>
-                        </div>
+        <div class="row">
+            <div class="card">
+                <div class="card-header">CPU Usage (Operating System)</div>
+                <div class="card-body">
+                    <h1 class="metric-text" id="cpu-text">0%</h1>
+                    <div class="progress-track">
+                        <div id="cpu-bar" class="progress-fill color-green"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-header bg-dark text-white fw-bold">
-                        RAM / Memory Usage
-                    </div>
-                    <div class="card-body d-flex flex-column justify-content-center p-4">
-                        <h1 class="display-2 mb-4 fw-bold" id="mem-text">0%</h1>
-                        <div class="progress shadow-sm" style="height: 35px; border-radius: 20px;">
-                            <div id="mem-bar" class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: 0%;"></div>
-                        </div>
+            <div class="card">
+                <div class="card-header">RAM / Memory Usage</div>
+                <div class="card-body">
+                    <h1 class="metric-text" id="mem-text">0%</h1>
+                    <div class="progress-track">
+                        <div id="mem-bar" class="progress-fill color-blue"></div>
                     </div>
                 </div>
             </div>
@@ -54,6 +108,7 @@
 
     <script>
         const CPU_THRESHOLD = 80.0;
+
         function updateDashboard() {
             fetch('/api/metrics')
                 .then(response => response.json())
@@ -61,8 +116,8 @@
                     const cpu = data.cpu_percent;
                     const mem = data.memory_percent;
 
-                    document.getElementById('cpu-text').innerText = cpu + '%';
-                    document.getElementById('mem-text').innerText = mem + '%';
+                    document.getElementById('cpu-text').innerText = cpu.toFixed(1) + '%';
+                    document.getElementById('mem-text').innerText = mem.toFixed(1) + '%';
 
                     const cpuBar = document.getElementById('cpu-bar');
                     cpuBar.style.width = cpu + '%';
@@ -73,27 +128,27 @@
                     const alertBanner = document.getElementById('alert-banner');
                     const title = document.getElementById('dashboard-title');
 
+                    // The logic perfectly matches your pseudo-code now
                     if (cpu >= CPU_THRESHOLD) {
                         body.classList.add('critical-mode');
                         alertBanner.style.display = 'block';
-                        title.classList.replace('text-primary', 'text-danger');
-                        cpuBar.classList.replace('bg-success', 'bg-danger');
-                        cpuBar.classList.replace('bg-warning', 'bg-danger');
+                        title.classList.add('danger-text');
+                        cpuBar.className = 'progress-fill color-red';
                     } else {
                         body.classList.remove('critical-mode');
                         alertBanner.style.display = 'none';
-                        title.classList.replace('text-danger', 'text-primary');
+                        title.classList.remove('danger-text');
+
                         if (cpu >= 60) {
-                            cpuBar.classList.replace('bg-success', 'bg-warning');
-                            cpuBar.classList.replace('bg-danger', 'bg-warning');
+                            cpuBar.className = 'progress-fill color-yellow';
                         } else {
-                            cpuBar.classList.replace('bg-warning', 'bg-success');
-                            cpuBar.classList.replace('bg-danger', 'bg-success');
+                            cpuBar.className = 'progress-fill color-green';
                         }
                     }
                 })
                 .catch(err => console.error("Failed to fetch metrics", err));
         }
+
         setInterval(updateDashboard, 2000);
         updateDashboard();
     </script>
