@@ -4,48 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RabbitMQ Publisher</title>
-    <link href="[https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css](https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css)" rel="stylesheet">
+    <style>
+        /* 100% Self-Contained CSS */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8f9fa; color: #333; margin: 0; padding: 40px 20px; }
+        .container { max-width: 800px; margin: 0 auto; text-align: center; }
+        h2 { color: #0d6efd; font-size: 2.2em; margin-bottom: 30px; font-weight: bold; }
+
+        /* Flash Alerts */
+        .alert { padding: 15px 20px; margin-bottom: 25px; border-radius: 8px; font-weight: bold; text-align: left; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .alert-success { background-color: #d1e7dd; color: #0f5132; border: 1px solid #badbcc; }
+        .alert-danger { background-color: #f8d7da; color: #842029; border: 1px solid #f5c2c7; }
+        .alert-warning { background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; }
+
+        /* Card Layout */
+        .row { display: flex; gap: 25px; justify-content: center; flex-wrap: wrap; }
+        .card { background: white; flex: 1; min-width: 300px; border-radius: 12px; box-shadow: 0 6px 15px rgba(0,0,0,0.05); padding: 30px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-title { font-size: 1.4em; color: #212529; margin: 0 0 10px 0; font-weight: bold; }
+        .card-text { color: #6c757d; margin-bottom: 25px; line-height: 1.5; }
+
+        /* Buttons and Inputs */
+        .btn { display: block; width: 100%; padding: 14px; border: none; border-radius: 8px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: transform 0.1s, opacity 0.2s; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn:hover { opacity: 0.9; }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background-color: #0d6efd; box-shadow: 0 4px 10px rgba(13, 110, 253, 0.3); }
+        .btn-success { background-color: #198754; box-shadow: 0 4px 10px rgba(25, 135, 84, 0.3); }
+
+        .input-group { display: flex; gap: 10px; }
+        .input-group input { flex: 1; padding: 14px; border: 1px solid #ced4da; border-radius: 8px; font-size: 1em; outline: none; transition: border-color 0.2s; }
+        .input-group input:focus { border-color: #198754; box-shadow: 0 0 0 3px rgba(25, 135, 84, 0.1); }
+        .input-group .btn { width: auto; padding: 14px 25px; }
+    </style>
 </head>
-<body class="bg-light">
-    <div class="container mt-5 text-center" style="max-width: 800px;">
-        <h2 class="mb-4 text-primary fw-bold">RabbitMQ Publisher Dashboard</h2>
+<body>
+    <div class="container">
+        <h2>RabbitMQ Publisher Dashboard</h2>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             {% for category, message in messages %}
-              <div class="alert alert-{{ category }} shadow-sm fw-bold" role="alert">
+              <div class="alert alert-{{ category }}">
                 {{ message }}
               </div>
             {% endfor %}
           {% endif %}
         {% endwith %}
 
-        <div class="row mt-4">
-            <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-body d-flex flex-column justify-content-center">
-                        <h5 class="card-title fw-bold">Automated Task</h5>
-                        <p class="card-text text-muted mb-4">Send 10 default messages.</p>
-                        <form action="/publish_default" method="POST">
-                            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">Send Messages</button>
-                        </form>
-                    </div>
+        <div class="row">
+            <div class="card">
+                <div>
+                    <h5 class="card-title">Automated Task</h5>
+                    <p class="card-text">Send 10 default messages automatically to the message broker.</p>
                 </div>
+                <form action="/publish_default" method="POST">
+                    <button type="submit" class="btn btn-primary">Send 10 Messages</button>
+                </form>
             </div>
 
-            <div class="col-md-6 mb-4">
-                <div class="card shadow-sm h-100 border-0">
-                    <div class="card-body d-flex flex-column justify-content-center">
-                        <h5 class="card-title fw-bold">Custom Message</h5>
-                        <p class="card-text text-muted mb-4">Publish a custom payload.</p>
-                        <form action="/publish_custom" method="POST">
-                            <div class="input-group shadow-sm">
-                                <input type="text" class="form-control" name="custom_message" placeholder="Enter message..." required>
-                                <button type="submit" class="btn btn-success fw-bold">Publish</button>
-                            </div>
-                        </form>
-                    </div>
+            <div class="card">
+                <div>
+                    <h5 class="card-title">Custom Message</h5>
+                    <p class="card-text">Publish a custom payload directly to the 'ABC' queue.</p>
                 </div>
+                <form action="/publish_custom" method="POST">
+                    <div class="input-group">
+                        <input type="text" name="custom_message" placeholder="Enter message..." required>
+                        <button type="submit" class="btn btn-success">Publish</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
