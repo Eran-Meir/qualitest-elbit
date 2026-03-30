@@ -120,3 +120,89 @@ Standard routers block multicast by default. To route messages between networks:
 ### 3. Example Scenario
 **Scenario:** A trading server in NY needs to send a multicast feed (`239.1.1.1`) to a branch in London over the internet.
 **Solution:** A GRE Tunnel is established between the NY and London routers. The NY router encapsulates the multicast packets into unicast packets. Once they arrive in London, the router decapsulates them and forwards the original feed to the analysts who joined the group via IGMP.
+
+---
+
+## Chaos Engineering & System Resilience Testing
+
+To demonstrate the fault tolerance of this microservices architecture, the following chaos engineering scenarios were executed. These tests prove that the system can handle unexpected broker outages and worker failures without data loss or catastrophic crashes.
+
+### Scenario 1: Broker Failure (RabbitMQ Down)
+This scenario tests how the web applications handle a sudden loss of connection to the message broker.
+
+**1. Induce Failure:**
+```bash
+sudo docker-compose stop rabbitmq
+```
+*Output:*
+```text
+eran@Ubuntu:~/qualitest-elbit$ sudo docker-compose stop rabbitmq
+Stopping rabbitmq_broker ... done
+eran@Ubuntu:~/qualitest-elbit$ 
+```
+
+**2. Publisher Behavior (Graceful Error Handling):**
+When attempting to publish a message while the broker is down, the Python backend catches the `AMQPConnectionError` after exhausting its retry loop. Instead of crashing the container, it surfaces a clean error to the UI.
+![Publisher Error](images/scenario1/publisher_error.png)
+
+**3. Consumer Behavior (Dynamic State Detection):**
+The background consumer thread detects the dropped connection. The Flask API immediately updates the frontend, shifting the UI badge from a green "Listening" state to a critical red "Disconnected" state.
+![Consumer Disconnected](images/scenario1/consumer_disconnected.png)
+
+**4. System Recovery (Restarting the Broker):**
+```bash
+sudo docker-compose start rabbitmq
+```
+*Output:*
+```text
+eran@Ubuntu:~/qualitest-elbit$ sudo docker-compose start rabbitmq
+Starting rabbitmq_broker ... done
+eran@Ubuntu:~/qualitest-elbit$ 
+```
+
+**5. Consumer Behavior (Self-Healing Connection):**
+The background consumer thread detects the restored connection. The Flask API immediately updates the frontend, dynamically shifting the UI badge from the red "Disconnected" state back to a healthy green "Listening" state.
+![Consumer Connected](images/scenario1/consumer_connected.png)
+
+
+### Scenario 2: Worker Outage & Queue Backpressure (Consumer Down)
+This scenario simulates a crashed consumer. It tests the broker's ability to safely queue messages (backpressure) and the consumer's ability to process the backlog once it recovers.
+
+**1. Induce Failure (Stop the Consumer):**
+```bash
+sudo docker-compose stop consumer
+```
+*Output:*
+```text
+eran@Ubuntu:~/qualitest-elbit$ sudo docker-compose stop consumer
+Stopping web_consumer ... done
+eran@Ubuntu:~/qualitest-elbit$ 
+```
+
+**2. Generate Traffic (Publisher is UP):**
+With the consumer offline, 100 default messages were sent by clicking the automated task button 10 times. A final custom payload reading `"Last message!"` was then published.
+![Publisher Sending](images/scenario2/publisher_sending.png)
+
+**3. Queue Accumulation (RabbitMQ Dashboard):**
+Because the broker remained active, RabbitMQ successfully stored all 101 messages in memory. The management dashboard visually confirms the messages accumulating in the `Ready` state.
+![RabbitMQ Accumulation](images/scenario2/rabbitmq_accumulation.png)
+
+**4. Worker Recovery:**
+The consumer service is brought back online.
+```bash
+sudo docker-compose start consumer
+```
+*Output:*
+```text
+eran@Ubuntu:~/qualitest-elbit$ sudo docker-compose start consumer
+Starting web_consumer ... done
+eran@Ubuntu:~/qualitest-elbit$ 
+```
+
+**5. Backlog Processing:**
+The moment the consumer container initializes and reconnects to the broker, it instantly drains the queue. The dashboard streams the backlog of messages.
+![Consumer Processing](images/scenario2/consumer_processing.png)
+
+**6. Verification of Final Payload:**
+The UI successfully renders the very last payload in the backlog, proving zero data loss occurred during the worker outage.
+![Consumer Last Message](images/scenario2/consumer_last_message.png)
